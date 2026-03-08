@@ -1,0 +1,12 @@
+{
+  "name": "bdd-ts-plugin",
+  "version": "1.0.0",
+  "description": "BDD testing plugin for TypeScript-React projects. Skills for component-level (vitest-cucumber) and E2E (Playwright) test scaffolding, plus an orchestrator agent that drives the full requirements-to-green-tests workflow.",
+  "author": {
+    "name": "Klegane",
+    "url": "https://github.com/Klegane"
+  },
+  "repository": "https://github.com/Klegane/bdd-ts-plugin",
+  "license": "MIT",
+  "keywords": ["bdd", "testing", "typescript", "react", "vitest-cucumber", "playwright", "gherkin"]
+}
