@@ -46,8 +46,8 @@ Accessibility tests use a distinct naming convention to co-exist with unit tests
 
 ### Rule 9: axe-core as Baseline
 Every accessibility feature file MUST include a baseline scenario that runs the full axe-core audit (`Then no automated accessibility violations are detected`). This catches a broad class of WCAG violations automatically.
-- Use `vitest-axe` (`import { axe, toHaveNoViolations } from 'vitest-axe'`).
-- Call `expect.extend(toHaveNoViolations)` at the top of the step definition file.
+- Use `vitest-axe`: `import { axe } from 'vitest-axe'` and `import { toHaveNoViolations } from 'vitest-axe/matchers.js'`.
+- Call `expect.extend({ toHaveNoViolations })` at the top of the step definition file.
 - Pass `render().container` to `axe()`, not a screen query result.
 
 ### Rule 10: Declarative Accessibility Language
@@ -185,14 +185,15 @@ Run `npm test -- --run src/components/$0` to confirm the new a11y scenarios fail
 Create or update `src/components/$0/$0.a11y.steps.tsx` following this structure:
 
 ```tsx
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup } from '@testing-library/react/pure'
 import userEvent from '@testing-library/user-event'
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber'
-import { axe, toHaveNoViolations } from 'vitest-axe'
+import { axe } from 'vitest-axe'
+import { toHaveNoViolations } from 'vitest-axe/matchers.js'
 import { expect } from 'vitest'
 import { ComponentName } from './ComponentName'
 
-expect.extend(toHaveNoViolations)
+expect.extend({ toHaveNoViolations })
 
 const feature = await loadFeature('./src/components/$0/$0.a11y.feature')
 
@@ -262,7 +263,7 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
 
 Key conventions and the reasoning behind them:
 
-- **`vitest-axe` imports** — import `axe` and `toHaveNoViolations` from `vitest-axe`. Call `expect.extend(toHaveNoViolations)` at the top level so the matcher is available in all scenarios.
+- **`vitest-axe` imports** — import `axe` from `vitest-axe` and `toHaveNoViolations` from `vitest-axe/matchers.js`. Call `expect.extend({ toHaveNoViolations })` (as an object, not the function directly) at the top level so the matcher is available in all scenarios.
 - **`container` capture** — the `render()` return value's `.container` must be stored for `axe()` calls. The `axe()` function needs a DOM node, not a screen query result.
 - **Parameterized axe rules** — use `runOnly: { type: 'tag', values: [...] }` to run axe against specific WCAG tags (e.g., `"color-contrast"`, `"wcag2aa"`, `"wcag21aa"`).
 - **Keyboard testing** — use `userEvent.tab()` to move focus and `userEvent.keyboard('{Enter}')` or `userEvent.keyboard(' ')` to activate. Assert focus with `expect(element).toHaveFocus()`.

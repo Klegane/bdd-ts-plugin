@@ -111,7 +111,7 @@ Run `npm test -- --run src/components/$0` to confirm the new scenarios fail with
 Create or update `src/components/$0/$0.steps.tsx` following this structure:
 
 ```tsx
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup } from '@testing-library/react/pure'
 import userEvent from '@testing-library/user-event'
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber'
 import { ComponentName } from './ComponentName'

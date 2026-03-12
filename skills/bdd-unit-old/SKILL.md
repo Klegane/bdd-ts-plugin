@@ -66,7 +66,7 @@ Follow these steps strictly in order:
 - Follow this exact structure:
 
 ```tsx
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup } from '@testing-library/react/pure'
 import userEvent from '@testing-library/user-event'
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber'
 import { ComponentName } from './ComponentName'
