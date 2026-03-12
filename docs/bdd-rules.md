@@ -50,3 +50,64 @@ This project uses `@amiceli/vitest-cucumber` which converts every Step into an i
 ### Rule 7: Playwright Locators
 - Use Playwright's accessible locators (`getByRole`, `getByText`, `getByLabel`) -- avoid raw CSS selectors and `getByTestId` where possible.
 - Keep page URLs and navigation logic inside step definitions, never in feature files.
+
+## Accessibility Test Rules (a11y component tests)
+
+### Rule 8: Accessibility File Naming
+Accessibility tests use a distinct naming convention to co-exist with unit tests:
+- `src/components/Button/Button.a11y.feature` -> `src/components/Button/Button.a11y.steps.tsx`
+- This follows the same one-to-one mapping as Rule 4, but with the `.a11y` infix.
+- Shared a11y steps go in `src/test/sharedA11ySteps.ts`.
+- Do **not** mix accessibility scenarios into the component's primary `.feature` file. Accessibility is a separate concern with its own assertions.
+
+### Rule 9: axe-core as Baseline
+Every accessibility feature file MUST include a baseline scenario that runs the full axe-core audit:
+
+```gherkin
+Scenario: No automated accessibility violations are detected
+  Given the component is rendered
+  Then no automated accessibility violations are detected
+```
+
+This catches a broad class of WCAG violations automatically. Additional targeted scenarios (keyboard navigation, focus order, specific ARIA patterns) supplement this baseline but never replace it.
+
+- Step definitions for axe-core assertions must use `vitest-axe` (`import { axe, toHaveNoViolations } from 'vitest-axe'`).
+- Call `expect.extend(toHaveNoViolations)` at the top of the step definition file.
+- Pass the rendered `container` (from `render().container`) to `axe()`, not a screen query result.
+
+### Rule 10: Declarative Accessibility Language
+Feature files describe accessibility requirements in user-facing language, not technical ARIA jargon:
+
+**Bad:**
+```gherkin
+Then the element has aria-label="Close dialog"
+Then the div has role="alert"
+```
+
+**Good:**
+```gherkin
+Then the close button has an accessible name
+Then the error notification is announced to screen readers
+```
+
+Step definitions translate these human-readable assertions into technical checks (ARIA attribute verification, role queries, axe-core rule targeting). The feature file is the accessibility contract for the whole team; the step file is the technical implementation.
+
+### Rule 11: Mandatory `@a11y` Tag and Selective Execution
+Every accessibility feature file MUST include the `@a11y` tag at the Feature level, along with the WCAG conformance level tag:
+
+```gherkin
+@a11y @wcag-aa
+Feature: Button accessibility
+  ...
+```
+
+This tag serves two purposes:
+1. **Identification**: makes it instantly clear in any test report or file listing that these are accessibility tests, separate from behavioral unit tests.
+2. **Selective execution**: allows teams to control when accessibility tests run.
+
+Common execution patterns:
+- **Run only a11y tests**: `npm test -- --run **/*.a11y.steps.tsx`
+- **Run everything except a11y tests**: configure vitest's `exclude` option or use glob negation in the test command.
+- **CI pipeline separation**: run unit tests in a fast pipeline stage and a11y tests in a dedicated accessibility gate.
+
+Never omit the `@a11y` tag from an accessibility feature file, even if the file is already named with the `.a11y` infix. The tag and the filename convention serve complementary purposes — the filename enables file-level filtering, and the tag enables report-level filtering and documentation.

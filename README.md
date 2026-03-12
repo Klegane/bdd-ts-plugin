@@ -7,15 +7,16 @@ A Claude Code plugin that provides skills and an orchestrator agent for Behavior
 ### Skills (on-demand workflows)
 
 - **`/bdd-ts-plugin:bdd-unit <ComponentName>`** -- Scaffold component-level BDD tests using `@amiceli/vitest-cucumber` and React Testing Library
+- **`/bdd-ts-plugin:bdd-a11y <ComponentName>`** -- Scaffold accessibility BDD tests using `@amiceli/vitest-cucumber`, React Testing Library, and `vitest-axe` (axe-core) for WCAG compliance
 - **`/bdd-ts-plugin:bdd-e2e <FlowName>`** -- Scaffold E2E BDD tests using Playwright
 
 ### Agent (requirements-driven orchestration)
 
-- **`bdd-orchestrator`** -- Takes user requirements as input, classifies the test type (unit vs E2E), extracts scenarios, and delegates to the appropriate skill. Drives the full workflow from requirements to passing tests.
+- **`bdd-orchestrator`** -- Takes user requirements as input, classifies the test type (unit vs accessibility vs E2E), extracts scenarios, and delegates to the appropriate skill. Drives the full workflow from requirements to passing tests.
 
 ### Bundled rules
 
-The plugin bundles 7 BDD rules (in `docs/bdd-rules.md`) that are automatically enforced by both skills and the agent:
+The plugin enforces 11 BDD rules, inlined directly into the agent and each skill (each skill carries only its relevant subset; the orchestrator carries the full set):
 
 1. Reusability First -- parameterized steps over duplicated steps
 2. Strict UI Interaction Separation -- no implementation details in feature files
@@ -24,6 +25,10 @@ The plugin bundles 7 BDD rules (in `docs/bdd-rules.md`) that are automatically e
 5. Vitest-Cucumber Architecture -- `describeFeature`/`Scenario` syntax, `AfterEachScenario` for cleanup
 6. E2E File Structure -- `e2e/features/`, `e2e/steps/`, `e2e/support/`
 7. Playwright Locators -- accessible locators, no raw CSS selectors
+8. Accessibility File Naming -- `.a11y.feature` / `.a11y.steps.tsx` co-located with component, shared a11y steps in `src/test/sharedA11ySteps.ts`
+9. axe-core as Baseline -- every a11y feature must include a full axe-core audit scenario
+10. Declarative Accessibility Language -- user-facing descriptions in features, technical ARIA/axe details in steps only
+11. Mandatory `@a11y` Tag -- every a11y feature is tagged `@a11y @wcag-aa` for selective execution and report filtering
 
 ## Installation
 
@@ -65,6 +70,12 @@ Scaffold a unit BDD test for a component:
 /bdd-ts-plugin:bdd-unit Button
 ```
 
+Scaffold an accessibility BDD test for a component:
+
+```
+/bdd-ts-plugin:bdd-a11y Button
+```
+
 Scaffold an E2E BDD test for a user flow:
 
 ```
@@ -91,6 +102,7 @@ The agent will:
 Your project needs:
 
 - **For unit BDD tests**: `@amiceli/vitest-cucumber`, `@testing-library/react`, `vitest`
+- **For accessibility BDD tests**: `@amiceli/vitest-cucumber`, `@testing-library/react`, `vitest`, `vitest-axe`
 - **For E2E BDD tests**: `@playwright/test` and a Playwright+Cucumber bridge (e.g., `playwright-bdd`)
 
 ## Plugin structure
@@ -102,12 +114,12 @@ bdd-ts-plugin/
 ├── skills/
 │   ├── bdd-unit/
 │   │   └── SKILL.md         # Component-level BDD skill
+│   ├── bdd-a11y/
+│   │   └── SKILL.md         # Accessibility BDD skill
 │   └── bdd-e2e/
 │       └── SKILL.md         # Playwright E2E BDD skill
 ├── agents/
-│   └── bdd-orchestrator.md  # Orchestrator agent
-├── docs/
-│   └── bdd-rules.md         # Bundled BDD rules
+│   └── bdd-orchestrator.md  # Orchestrator agent (carries all 11 rules)
 ├── settings.json             # Default agent settings
 └── LICENSE
 ```

@@ -1,0 +1,58 @@
+{
+  "skill_name": "bdd-unit",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "simple-button-component",
+      "prompt": "hey, I need BDD tests for my Button component. it has variants (primary, secondary, danger), can be disabled, and shows a loading spinner when isLoading is true. the component is at src/components/Button/Button.tsx",
+      "expected_output": "A .feature file with scenarios covering each variant, disabled state, and loading state, plus a .steps.tsx file implementing those scenarios with RTL. Tests should pass.",
+      "files": [],
+      "assertions": [
+        "A file src/components/Button/Button.feature is created",
+        "A file src/components/Button/Button.steps.tsx is created",
+        "The .feature file contains at least 3 distinct Scenario blocks",
+        "The .feature file uses parameterized steps with quoted strings for variants (e.g. \"primary\", \"secondary\")",
+        "The .feature file does NOT contain any CSS selectors, data-testid attributes, or class names",
+        "The .steps.tsx file imports from @testing-library/react and @amiceli/vitest-cucumber",
+        "The .steps.tsx file uses loadFeature with the correct path to the .feature file",
+        "The .steps.tsx file uses describeFeature, not describe or it",
+        "The .steps.tsx file uses AfterEachScenario with cleanup(), not beforeEach",
+        "All parameterized step callbacks use _ctx as first argument",
+        "Step matchers use {string} or {int} templates, not regex",
+        "npm test passes for the Button component"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "incremental-add-scenarios",
+      "prompt": "I already have BDD tests for my Modal component but I need to add scenarios for: 1) closing the modal when pressing Escape, 2) trapping focus inside the modal. The existing files are at src/components/Modal/Modal.feature and src/components/Modal/Modal.steps.tsx",
+      "expected_output": "The existing .feature and .steps.tsx files are updated with new scenarios appended, without overwriting existing scenarios. Tests pass.",
+      "files": [],
+      "assertions": [
+        "The skill reads the existing Modal.feature before modifying it",
+        "The skill reads the existing Modal.steps.tsx before modifying it",
+        "Previously existing scenarios in Modal.feature are preserved unchanged",
+        "Two new Scenario blocks are added to Modal.feature (Escape key and focus trap)",
+        "Corresponding step definitions are added to Modal.steps.tsx",
+        "The new steps follow the same code style as existing steps",
+        "npm test passes for the Modal component"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "shared-steps-reuse",
+      "prompt": "create bdd tests for the SearchInput component at src/components/SearchInput/SearchInput.tsx — it renders an input, calls onSearch when you type and press Enter, and shows a clear button when there's text. I think we already have some shared steps for input interactions",
+      "expected_output": "A .feature and .steps.tsx that reuse shared steps where applicable instead of duplicating them. The skill should check sharedSteps.ts and existing feature files first.",
+      "files": [],
+      "assertions": [
+        "The skill reads src/test/sharedSteps.ts before writing step definitions",
+        "The skill checks existing .feature files for reusable step patterns",
+        "The .feature file is created at src/components/SearchInput/SearchInput.feature",
+        "The .steps.tsx file imports and uses shared steps where matching patterns exist",
+        "The .feature file contains scenarios for: rendering, typing + Enter, and clear button",
+        "No step definition duplicates functionality already available in sharedSteps.ts",
+        "The scenario-to-requirement mapping is presented to the user before writing files"
+      ]
+    }
+  ]
+}

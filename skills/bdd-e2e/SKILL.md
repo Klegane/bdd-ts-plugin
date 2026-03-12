@@ -11,7 +11,31 @@ Scaffold an end-to-end BDD test for the `$0` user flow using Playwright.
 
 ## BDD Rules (always enforced)
 
-Read and strictly follow every rule in [bdd-rules.md](${CLAUDE_SKILL_DIR}/../../docs/bdd-rules.md) before proceeding.
+These rules are non-negotiable. They exist to maintain consistency across the entire test suite — skipping them leads to drift that's painful to fix later.
+
+### Rule 1: Reusability First
+Before writing a new step definition, verify if a similar step already exists. Re-use parameter types like `{string}` and `{int}` instead of writing granular, variant-specific steps.
+
+**Bad:** `Given('a primary button', ...)` and `Given('a secondary button', ...)`
+**Good:** `Given('a {string} button', (_ctx, variant: string) => ...)`
+
+### Rule 2: Strict UI Interaction Separation
+- **Step definitions** handle all technical interactions (selectors, locators, API calls).
+- **Feature files** contain only human-readable, domain-specific text.
+- **Never** place CSS selectors, XPath strings, URLs, or implementation details inside `.feature` files.
+
+### Rule 3: Step Matching
+- Only use string templates (`{string}`, `{int}`) for step matching — never raw regex matchers.
+- Accept `_ctx` as the first argument in all parameterized steps.
+
+### Rule 6: E2E File Structure
+- Feature files go in `e2e/features/`.
+- Step definitions go in `e2e/steps/`.
+- Shared E2E helpers go in `e2e/support/sharedSteps.ts`.
+
+### Rule 7: Playwright Locators
+- Use Playwright's accessible locators (`getByRole`, `getByText`, `getByLabel`) — avoid raw CSS selectors and `getByTestId` where possible.
+- Keep page URLs and navigation logic inside step definitions, never in feature files.
 
 ## Existing E2E shared steps
 

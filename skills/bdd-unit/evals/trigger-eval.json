@@ -1,0 +1,74 @@
+[
+  {
+    "query": "ok I need to add BDD tests for the Dropdown component. it's at src/components/Dropdown/Dropdown.tsx and supports single select, multi select, and has keyboard navigation. can you scaffold the feature file and steps?",
+    "should_trigger": true
+  },
+  {
+    "query": "the UserCard.feature file has a failing scenario — the 'displays avatar' step isn't mapped in UserCard.steps.tsx. can you fix it?",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to add a scenario to my existing Sidebar.feature for testing the collapsed state. the sidebar component is in src/components/Sidebar/",
+    "should_trigger": true
+  },
+  {
+    "query": "we need component tests for the Tabs component using gherkin scenarios and vitest-cucumber. tabs can be horizontal or vertical and support disabled tabs",
+    "should_trigger": true
+  },
+  {
+    "query": "create a .feature file and step definitions for my Tooltip component — it should show on hover, hide on blur, and support custom placement (top, bottom, left, right)",
+    "should_trigger": true
+  },
+  {
+    "query": "hey I just created a new Accordion component and I want to test its behaviors: expand/collapse on click, only-one-open mode, keyboard accessibility. can you set up the bdd tests?",
+    "should_trigger": true
+  },
+  {
+    "query": "I need to refactor the Pagination.steps.tsx — the step definitions are duplicating shared steps we already have in sharedSteps.ts. can you clean it up?",
+    "should_trigger": true
+  },
+  {
+    "query": "can you scaffold tests for AlertBanner? it has dismiss, auto-dismiss after 5s, and four severity levels (info, warning, error, success). let's do it BDD style with feature files",
+    "should_trigger": true
+  },
+  {
+    "query": "write me a unit test for the calculateDiscount utility function using vitest. it takes a price and a percentage and returns the discounted amount",
+    "should_trigger": false
+  },
+  {
+    "query": "I need to set up Playwright e2e tests for the checkout flow — user adds item to cart, goes to checkout, fills the form, and sees the confirmation page",
+    "should_trigger": false
+  },
+  {
+    "query": "can you help me write a Cypress test for the login page? I want to test that invalid credentials show an error message",
+    "should_trigger": false
+  },
+  {
+    "query": "I need integration tests for our REST API — POST /api/users should validate the email field and return 400 if it's missing",
+    "should_trigger": false
+  },
+  {
+    "query": "hey can you add some snapshot tests for the Card component? I want to make sure the rendered output doesn't change unexpectedly",
+    "should_trigger": false
+  },
+  {
+    "query": "set up vitest with react testing library in my project — I need the config file and the setup file for jsdom environment",
+    "should_trigger": false
+  },
+  {
+    "query": "write a cucumber feature file for our backend API using cucumber-js — it's a Node Express server and I want to test the authentication endpoints",
+    "should_trigger": false
+  },
+  {
+    "query": "I need to write a storybook story for the Button component showing all its variants — primary, secondary, danger, and disabled states",
+    "should_trigger": false
+  },
+  {
+    "query": "can you add test coverage reporting to our vitest config? I want to see which components are missing tests",
+    "should_trigger": false
+  },
+  {
+    "query": "my jest tests are failing after upgrading to React 19 — the render function is throwing warnings about act(). how do I fix this?",
+    "should_trigger": false
+  }
+]
