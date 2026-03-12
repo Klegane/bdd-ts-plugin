@@ -19,9 +19,26 @@ These rules apply to all component-level BDD tests in this project. Every `.feat
 3. Use `AfterEachScenario(() => { cleanup() })` — never `beforeEach` or `afterEach` from vitest.
 4. All parameterized step callbacks must use `_ctx` as the first argument.
 5. Use `{string}` and `{int}` templates for step matching — never regex.
-6. Import `render`, `screen`, `cleanup` from `@testing-library/react`.
+6. Import `render`, `screen`, `cleanup` from `@testing-library/react/pure`.
 7. Import `userEvent` from `@testing-library/user-event`.
-8. Prefer `screen.getByRole` and accessible queries over `getByTestId`.
+8. Import `@testing-library/jest-dom/vitest` for semantic matchers.
+9. Prefer `screen.getByRole` and accessible queries over `getByTestId`.
+
+## Assertion quality
+
+1. **NEVER** use `.toBeTruthy()` or `.toBeDefined()` to assert element existence — `getBy*` already throws if missing, so `.toBeTruthy()` is a no-op.
+2. Use `toBeInTheDocument()` for presence checks.
+3. Use `toHaveAttribute('name', 'value')` for attribute assertions (href, target, rel, type, etc.).
+4. Use `toHaveTextContent()` for text assertions when you don't need an exact element match.
+5. Use `toBeVisible()` when testing that an element is not just in the DOM but visible.
+6. Use `toHaveAccessibleName()` for accessible name verification.
+7. Use `userEvent` (never `fireEvent`) for all interaction assertions — it simulates real browser behavior.
+
+## Data-driven components
+
+1. When testing a component that renders items from a data array, first assert that the array is non-empty: `expect(items.length).toBeGreaterThan(0)`.
+2. Assert the expected count of rendered items: `expect(screen.getAllByRole('listitem')).toHaveLength(items.length)`.
+3. Never iterate over a data array to make assertions without the above guards — an empty array means zero assertions and a silently passing test.
 
 ## Shared steps
 

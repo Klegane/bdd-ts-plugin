@@ -13,12 +13,17 @@
         "The .feature file contains at least 3 distinct Scenario blocks",
         "The .feature file uses parameterized steps with quoted strings for variants (e.g. \"primary\", \"secondary\")",
         "The .feature file does NOT contain any CSS selectors, data-testid attributes, or class names",
-        "The .steps.tsx file imports from @testing-library/react and @amiceli/vitest-cucumber",
+        "The .steps.tsx file imports from @testing-library/react/pure and @amiceli/vitest-cucumber",
+        "The .steps.tsx file imports @testing-library/jest-dom/vitest for semantic matchers",
         "The .steps.tsx file uses loadFeature with the correct path to the .feature file",
         "The .steps.tsx file uses describeFeature, not describe or it",
         "The .steps.tsx file uses AfterEachScenario with cleanup(), not beforeEach",
         "All parameterized step callbacks use _ctx as first argument",
         "Step matchers use {string} or {int} templates, not regex",
+        "The .steps.tsx file does NOT use .toBeTruthy() or .toBeDefined() for element presence checks",
+        "The .steps.tsx file uses toBeInTheDocument() for verifying element presence",
+        "The .steps.tsx file uses toHaveAttribute() for attribute assertions (not getAttribute())",
+        "The .steps.tsx file includes at least one interaction scenario using userEvent (click, keyboard, etc.)",
         "npm test passes for the Button component"
       ]
     },
@@ -35,6 +40,8 @@
         "Two new Scenario blocks are added to Modal.feature (Escape key and focus trap)",
         "Corresponding step definitions are added to Modal.steps.tsx",
         "The new steps follow the same code style as existing steps",
+        "The new step definitions use userEvent for keyboard interactions (Escape key, Tab for focus trap)",
+        "The new step definitions do NOT use .toBeTruthy() for element checks — use toBeInTheDocument() or toHaveFocus()",
         "npm test passes for the Modal component"
       ]
     },
@@ -49,9 +56,31 @@
         "The skill checks existing .feature files for reusable step patterns",
         "The .feature file is created at src/components/SearchInput/SearchInput.feature",
         "The .steps.tsx file imports and uses shared steps where matching patterns exist",
+        "The .steps.tsx file imports @testing-library/jest-dom/vitest",
         "The .feature file contains scenarios for: rendering, typing + Enter, and clear button",
         "No step definition duplicates functionality already available in sharedSteps.ts",
-        "The scenario-to-requirement mapping is presented to the user before writing files"
+        "The scenario-to-requirement mapping is presented to the user before writing files",
+        "The .steps.tsx file uses userEvent for typing and keyboard interactions, not fireEvent",
+        "The .steps.tsx file does NOT use .toBeTruthy() for element presence checks"
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "data-driven-list-component",
+      "prompt": "I need BDD tests for my GamesList component at src/components/GamesList/GamesList.tsx — it imports an array of games from a data file and renders a card for each one. Each card shows the game title, a subtitle, and links to an external URL. The card opens in a new tab.",
+      "expected_output": "A .feature file with scenarios for rendering all games, verifying links, and new-tab behavior. The .steps.tsx must guard against empty data arrays and verify correct item count.",
+      "files": [],
+      "assertions": [
+        "A file src/components/GamesList/GamesList.feature is created",
+        "A file src/components/GamesList/GamesList.steps.tsx is created",
+        "The .steps.tsx file asserts the data array is non-empty before iterating (expect(items.length).toBeGreaterThan(0) or equivalent)",
+        "The .steps.tsx file asserts the correct number of rendered items (e.g. getAllByRole('link')).toHaveLength(...))",
+        "The .steps.tsx file uses toBeInTheDocument() for presence checks, NOT .toBeTruthy()",
+        "The .steps.tsx file uses toHaveAttribute('href', ...) for link URL checks",
+        "The .steps.tsx file uses toHaveAttribute('target', '_blank') for new-tab checks",
+        "The .steps.tsx file uses toHaveAttribute('rel', expect.stringContaining('noopener')) for security checks",
+        "The .steps.tsx file imports @testing-library/jest-dom/vitest",
+        "npm test passes for the GamesList component"
       ]
     }
   ]

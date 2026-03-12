@@ -19,14 +19,25 @@ These rules apply to all accessibility BDD tests in this project. Every `.a11y.f
 
 1. One steps file per component, colocated: `src/components/<Name>/<Name>.a11y.steps.tsx`.
 2. Import `axe` and `toHaveNoViolations` from `vitest-axe`.
-3. Call `expect.extend(toHaveNoViolations)` at the top of the file.
-4. Pass `render().container` to `axe()` — never a screen query result.
-5. Use `runOnly: { type: 'tag', values: [...] }` for targeted axe checks.
-6. Use `loadFeature` and `describeFeature` from `@amiceli/vitest-cucumber`.
-7. Use `AfterEachScenario(() => { cleanup() })` — never `beforeEach`.
-8. All parameterized step callbacks must use `_ctx` as the first argument.
-9. Use `{string}` and `{int}` templates for step matching — never regex.
-10. Use `userEvent.tab()` and `userEvent.keyboard('{Enter}')` for keyboard testing.
+3. Call `expect.extend({ toHaveNoViolations })` at the top of the file.
+4. Import `@testing-library/jest-dom/vitest` for semantic matchers.
+5. Pass `render().container` to `axe()` — never a screen query result.
+6. Use `runOnly: { type: 'tag', values: [...] }` for targeted axe checks.
+7. Use `loadFeature` and `describeFeature` from `@amiceli/vitest-cucumber`.
+8. Use `AfterEachScenario(() => { cleanup() })` — never `beforeEach`.
+9. All parameterized step callbacks must use `_ctx` as the first argument.
+10. Use `{string}` and `{int}` templates for step matching — never regex.
+11. Use `userEvent.tab()` and `userEvent.keyboard('{Enter}')` for keyboard testing.
+
+## Assertion quality (non-axe assertions)
+
+A11y step files often include non-axe assertions (e.g., checking headings exist, verifying accessible names). These MUST follow the same assertion quality rules as unit tests:
+
+1. **NEVER** use `.toBeTruthy()` or `.toBeDefined()` for element presence — use `toBeInTheDocument()`.
+2. Use `toHaveAccessibleName()` for accessible name checks.
+3. Use `toHaveFocus()` for focus assertions after keyboard navigation.
+4. Use `toHaveAttribute()` for attribute-level assertions.
+5. `getBy*` queries already throw if the element is missing — wrapping them in `.toBeTruthy()` is a no-op that tests nothing.
 
 ## Shared a11y steps
 

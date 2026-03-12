@@ -43,6 +43,52 @@ This project uses `@amiceli/vitest-cucumber` which converts every Step into an i
 - Use the `describeFeature` and `Scenario` wrapper syntax.
 - Use `AfterEachScenario` from the `describeFeature` parameters. Do **not** use `beforeEach()` — it resets DOM state between individual step executions.
 
+### Rule 6: Assertion Quality
+Assertions must verify something meaningful. A weak assertion that never fails is worse than no assertion — it gives false confidence.
+
+- **NEVER** use `.toBeTruthy()` or `.toBeDefined()` to check element existence. RTL's `getBy*` queries already throw if the element is missing, so `.toBeTruthy()` is a no-op that tests nothing.
+- **Always import** `@testing-library/jest-dom/vitest` at the top of step definition files to enable semantic matchers.
+- **Use semantic matchers** from `@testing-library/jest-dom`:
+  - `toBeInTheDocument()` — element exists in the DOM
+  - `toHaveAttribute('href', '/path')` — element has a specific attribute value
+  - `toHaveTextContent('text')` — element contains expected text
+  - `toBeVisible()` — element is visible to the user
+  - `toHaveAccessibleName()` — element has an accessible name
+
+**Bad:** `expect(screen.getByText('Submit')).toBeTruthy()` — the `getByText` already throws if missing; `.toBeTruthy()` never fails and verifies nothing.
+**Good:** `expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument()`
+**Good:** `expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com')`
+**Good:** `expect(screen.getByRole('link')).toHaveAttribute('target', '_blank')`
+
+### Rule 7: Data-Driven Component Guards
+When a component renders items from a data array (e.g., a list of cards, navigation items, table rows):
+
+- **Always assert the expected count** — verify the correct number of items rendered, not just that "some" exist.
+- **Guard against empty arrays** — if the test iterates over a data array to make assertions, first assert the array is non-empty. An empty array means zero assertions, which is a silently passing test that verifies nothing.
+
+**Bad:**
+```tsx
+games.forEach((game) => {
+  expect(screen.getByRole('link', { name: new RegExp(game.title) })).toBeTruthy()
+})
+```
+**Good:**
+```tsx
+expect(games.length).toBeGreaterThan(0)
+const links = screen.getAllByRole('link')
+expect(links).toHaveLength(games.length)
+games.forEach((game) => {
+  expect(screen.getByRole('link', { name: new RegExp(game.title) })).toBeInTheDocument()
+})
+```
+
+### Rule 8: Interaction Coverage
+When a component has interactive elements (links, buttons, inputs, toggleable widgets), the test suite MUST include at least one scenario that exercises user interaction, not just static rendering.
+
+- Use `userEvent` from `@testing-library/user-event` for all interactions — never `fireEvent`.
+- If a component wraps interactive elements (e.g., a card that is an `<a>` tag), test the interaction contract: that the link navigates, that `target` and `rel` attributes are correct, that click handlers fire.
+- If a component has hover/focus states, test that the element receives focus via keyboard (`userEvent.tab()`).
+
 ## Existing shared steps
 
 The following shared helpers and mock data are available for reuse. Duplicating what already exists here wastes effort and creates maintenance burden:
@@ -114,6 +160,7 @@ Create or update `src/components/$0/$0.steps.tsx` following this structure:
 import { render, screen, cleanup } from '@testing-library/react/pure'
 import userEvent from '@testing-library/user-event'
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber'
+import '@testing-library/jest-dom/vitest'
 import { ComponentName } from './ComponentName'
 
 const feature = await loadFeature('./src/components/$0/$0.feature')
@@ -123,9 +170,42 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
     cleanup()
   })
 
-  Scenario('Scenario name matching feature file', ({ Given, When, Then, And }) => {
-    Given('step with {string}', (_ctx, param: string) => {
-      // RTL implementation
+  // Static rendering assertion — use toBeInTheDocument(), never toBeTruthy()
+  Scenario('The title is visible', ({ Given, Then }) => {
+    Given('a component with title {string}', (_ctx, title: string) => {
+      render(<ComponentName title={title} />)
+    })
+
+    Then('the text {string} is visible', (_ctx, text: string) => {
+      expect(screen.getByText(text)).toBeInTheDocument()
+    })
+  })
+
+  // Attribute assertion — use toHaveAttribute() for href, target, rel, etc.
+  Scenario('The card links to the correct URL', ({ Given, Then }) => {
+    Given('a card linking to {string}', (_ctx, href: string) => {
+      render(<ComponentName href={href} />)
+    })
+
+    Then('the card links to {string}', (_ctx, expectedHref: string) => {
+      expect(screen.getByRole('link')).toHaveAttribute('href', expectedHref)
+    })
+  })
+
+  // Interaction assertion — use userEvent, never fireEvent
+  Scenario('The button triggers its handler', ({ Given, When, Then }) => {
+    let clicked = false
+
+    Given('a button is rendered', () => {
+      render(<ComponentName onClick={() => { clicked = true }} />)
+    })
+
+    When('the user clicks the button', async () => {
+      await userEvent.click(screen.getByRole('button'))
+    })
+
+    Then('the click handler is called', () => {
+      expect(clicked).toBe(true)
     })
   })
 })
@@ -133,6 +213,10 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
 
 Key conventions and the reasoning behind them:
 
+- **`@testing-library/jest-dom/vitest` import** — enables semantic matchers (`toBeInTheDocument`, `toHaveAttribute`, `toBeVisible`, `toHaveTextContent`, `toHaveAccessibleName`). Without this import, these matchers are not available.
+- **`toBeInTheDocument()` over `toBeTruthy()`** — `getBy*` queries throw when an element is missing, making `toBeTruthy()` a no-op. `toBeInTheDocument()` is semantically correct and reads clearly in test output.
+- **`toHaveAttribute()` for attribute checks** — more readable and produces better error messages than `getAttribute() === value`.
+- **`userEvent` over `fireEvent`** — `userEvent` simulates real browser behavior (focus, blur, keydown, keyup) while `fireEvent` dispatches synthetic events that skip important side effects.
 - **`_ctx` as the first argument** in all parameterized steps — vitest-cucumber passes context as the first arg; ignoring it with `_ctx` keeps TypeScript happy and makes the actual parameters visually obvious.
 - **String templates (`{string}`, `{int}`) for step matching** — never regex. Regex is harder to read and doesn't compose well with vitest-cucumber's built-in parameter handling.
 - **`AfterEachScenario` for cleanup** — never `beforeEach()`. vitest-cucumber manages its own lifecycle; mixing in Vitest's lifecycle hooks causes subtle ordering bugs.

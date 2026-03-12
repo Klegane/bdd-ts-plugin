@@ -63,6 +63,20 @@ Every accessibility feature file MUST include the `@a11y` tag at the Feature lev
 - **CI separation**: run unit tests in a fast stage and a11y tests in a dedicated gate.
 Never omit the `@a11y` tag, even though the `.a11y` filename infix also exists — they serve complementary purposes.
 
+### Rule 12: Assertion Quality (non-axe assertions)
+A11y step files often include non-axe assertions (e.g., checking headings exist, verifying accessible names, confirming focus). These MUST use semantic matchers, not weak placeholders.
+
+- **NEVER** use `.toBeTruthy()` or `.toBeDefined()` for element presence. RTL's `getBy*` queries already throw if the element is missing, making `.toBeTruthy()` a no-op.
+- **Always import** `@testing-library/jest-dom/vitest` at the top of step definition files.
+- **Use semantic matchers**:
+  - `toBeInTheDocument()` — element exists in the DOM
+  - `toHaveAccessibleName()` — element has an accessible name
+  - `toHaveFocus()` — element has focus (for keyboard navigation assertions)
+  - `toHaveAttribute()` — element has a specific attribute value
+
+**Bad:** `expect(screen.getByRole('heading')).toBeTruthy()`
+**Good:** `expect(screen.getByRole('heading', { name: /section title/i })).toBeInTheDocument()`
+
 ## Existing shared accessibility steps
 
 The following shared a11y helpers are available for reuse. Duplicating what already exists here wastes effort and creates maintenance burden:
@@ -191,6 +205,7 @@ import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber'
 import { axe } from 'vitest-axe'
 import { toHaveNoViolations } from 'vitest-axe/matchers.js'
 import { expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { ComponentName } from './ComponentName'
 
 expect.extend({ toHaveNoViolations })

@@ -93,6 +93,9 @@ When providing data, use realistic business-layer data. Avoid abstract variables
 - **Magic Numbers/Strings**: Do not use literals directly in asserts without context.
 - **Multiple Disconnected Asserts**: Ensure you test a single behavior per test.
 - **Conditionals in Tests**: If the test requires an `if`, you must split it into two distinct tests.
+- **No-op Assertions**: NEVER use `.toBeTruthy()` or `.toBeDefined()` to check element existence. RTL's `getBy*` queries throw when an element is missing, making `.toBeTruthy()` an assertion that can never fail. Use `toBeInTheDocument()`, `toHaveAttribute()`, `toHaveTextContent()`, or `toBeVisible()` from `@testing-library/jest-dom` instead. Always import `@testing-library/jest-dom/vitest` in step definition files.
+- **Unguarded Iterations**: NEVER loop over a data array to make assertions without first asserting the array is non-empty. An empty array produces zero assertions and a silently passing test. Always add `expect(items.length).toBeGreaterThan(0)` before the loop.
+- **Missing Interaction Coverage**: If a component has interactive elements (links, buttons, inputs), the test suite MUST include at least one scenario that exercises user interaction via `userEvent`, not just static rendering checks.
 
 ## Workflow
 
