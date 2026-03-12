@@ -1,0 +1,66 @@
+{
+  "skill_name": "bdd-a11y",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "button-a11y-full-audit",
+      "prompt": "test accessibility for my Button component at src/components/Button/Button.tsx — it has variants (primary, secondary, danger), can be disabled, and renders an icon next to the label",
+      "expected_output": "A .a11y.feature file with scenarios covering a baseline axe audit, keyboard operability, accessible name, and color contrast, plus a .a11y.steps.tsx file implementing those scenarios with vitest-axe and RTL. Tests should pass.",
+      "files": [],
+      "assertions": [
+        "A file src/components/Button/Button.a11y.feature is created",
+        "A file src/components/Button/Button.a11y.steps.tsx is created",
+        "The .a11y.feature file includes @a11y and @wcag-aa tags at the Feature level",
+        "The .a11y.feature file contains a baseline scenario: 'No automated accessibility violations are detected'",
+        "The .a11y.feature file uses parameterized steps with quoted strings for variants",
+        "The .a11y.feature file does NOT contain ARIA attribute names, axe-core rule IDs, or CSS selectors",
+        "The .a11y.steps.tsx file imports axe and toHaveNoViolations from vitest-axe",
+        "The .a11y.steps.tsx file calls expect.extend(toHaveNoViolations) at the top level",
+        "The .a11y.steps.tsx file passes render().container to axe(), not a screen query",
+        "The .a11y.steps.tsx file uses describeFeature and Scenario from @amiceli/vitest-cucumber",
+        "The .a11y.steps.tsx file uses AfterEachScenario with cleanup(), not beforeEach",
+        "All parameterized step callbacks use _ctx as first argument",
+        "Step matchers use {string} or {int} templates, not regex",
+        "The scenario-to-requirement mapping is presented to the user before writing files",
+        "npm test passes for the Button component"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "form-keyboard-navigation",
+      "prompt": "I need WCAG accessibility tests for the LoginForm component at src/components/LoginForm/LoginForm.tsx — it has email and password inputs, a submit button, and shows inline error messages on validation failure. I care about keyboard navigation, proper label association, and error identification for screen readers",
+      "expected_output": "A .a11y.feature file with scenarios for axe baseline, keyboard tab order through form fields, label-input association, and error message accessibility. A .a11y.steps.tsx with RTL and vitest-axe implementations.",
+      "files": [],
+      "assertions": [
+        "A file src/components/LoginForm/LoginForm.a11y.feature is created",
+        "A file src/components/LoginForm/LoginForm.a11y.steps.tsx is created",
+        "The .a11y.feature includes a baseline axe audit scenario",
+        "The .a11y.feature includes a keyboard navigation scenario",
+        "The .a11y.feature includes a scenario about form labels being associated with inputs",
+        "The .a11y.feature includes a scenario about error messages being accessible",
+        "The .a11y.feature describes error identification in user-facing language, not aria-describedby or role=alert jargon",
+        "The .a11y.steps.tsx uses userEvent.tab() for keyboard navigation testing",
+        "The .a11y.steps.tsx uses expect(element).toHaveFocus() or similar focus assertions",
+        "npm test passes for the LoginForm component"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "incremental-a11y-add",
+      "prompt": "I already have a11y tests for my Modal component but I need to add a color contrast scenario and a focus trap scenario. The existing files are at src/components/Modal/Modal.a11y.feature and src/components/Modal/Modal.a11y.steps.tsx",
+      "expected_output": "The existing .a11y.feature and .a11y.steps.tsx files are updated with new scenarios appended, without overwriting existing scenarios. Tests pass.",
+      "files": [],
+      "assertions": [
+        "The skill reads the existing Modal.a11y.feature before modifying it",
+        "The skill reads the existing Modal.a11y.steps.tsx before modifying it",
+        "Previously existing scenarios in Modal.a11y.feature are preserved unchanged",
+        "A new color contrast scenario is added to Modal.a11y.feature",
+        "A new focus trap scenario is added to Modal.a11y.feature",
+        "Corresponding step definitions are added to Modal.a11y.steps.tsx",
+        "The color contrast step uses axe with runOnly targeting color-contrast rules",
+        "The @a11y tag is still present at the Feature level",
+        "npm test passes for the Modal component"
+      ]
+    }
+  ]
+}

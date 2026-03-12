@@ -1,0 +1,63 @@
+{
+  "skill_name": "bdd-e2e",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "checkout-flow",
+      "prompt": "create E2E BDD tests for the checkout flow — user browses the product catalog, adds an item to the cart, fills the shipping form with their address, and sees an order confirmation page with a summary",
+      "expected_output": "A .feature file in e2e/features/ with scenarios covering the full checkout journey, plus a .steps.ts file in e2e/steps/ implementing those scenarios with Playwright. Tests should pass.",
+      "files": [],
+      "assertions": [
+        "A file e2e/features/Checkout.feature is created",
+        "A file e2e/steps/Checkout.steps.ts is created",
+        "The .feature file contains at least 3 distinct Scenario blocks covering browsing, cart, and confirmation",
+        "The .feature file uses parameterized steps with quoted strings for variable data",
+        "The .feature file does NOT contain any URLs, CSS selectors, or page paths",
+        "The .steps.ts file uses Playwright's page object for browser interactions",
+        "The .steps.ts file uses accessible locators (getByRole, getByText, getByLabel) instead of raw CSS selectors",
+        "The .steps.ts file maps page names to URLs inside step definitions, not in the feature file",
+        "All parameterized step callbacks use _ctx as first argument",
+        "Step matchers use {string} or {int} templates, not regex",
+        "The scenario-to-requirement mapping is presented to the user before writing files",
+        "npx playwright test passes for the Checkout flow"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "login-flow-with-error",
+      "prompt": "I need Playwright BDD tests for the login flow — valid credentials should redirect the user to the dashboard with a welcome message, invalid credentials should show an inline error message, and there should be a 'forgot password' link that navigates to the reset page",
+      "expected_output": "A .feature file with scenarios for successful login, failed login, and forgot password navigation, plus a .steps.ts file with Playwright implementations.",
+      "files": [],
+      "assertions": [
+        "A file e2e/features/Login.feature is created",
+        "A file e2e/steps/Login.steps.ts is created",
+        "The .feature file includes a scenario for successful login with redirect",
+        "The .feature file includes a scenario for invalid credentials showing an error",
+        "The .feature file includes a scenario for forgot password navigation",
+        "The .feature file describes outcomes in user-facing language, not technical details",
+        "The .steps.ts file uses page.getByRole or page.getByLabel for form interactions",
+        "The .steps.ts file keeps URLs inside step definitions",
+        "The .steps.ts file uses AfterEachScenario to close the page",
+        "npx playwright test passes for the Login flow"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "shared-steps-reuse-e2e",
+      "prompt": "add E2E BDD tests for the password reset flow — user clicks forgot password on the login page, enters their email, sees a confirmation message, then follows the reset link and sets a new password. We already have shared navigation steps in e2e/support/sharedSteps.ts that handle common page navigation",
+      "expected_output": "A .feature and .steps.ts that reuse shared E2E steps from e2e/support/sharedSteps.ts where applicable. The skill should check shared steps first.",
+      "files": [],
+      "assertions": [
+        "The skill reads e2e/support/sharedSteps.ts before writing step definitions",
+        "The skill checks existing e2e/features/ files for reusable step patterns",
+        "A file e2e/features/PasswordReset.feature is created",
+        "A file e2e/steps/PasswordReset.steps.ts is created",
+        "The .steps.ts file imports and uses shared steps where matching patterns exist",
+        "The .feature file contains scenarios covering: forgot password link, email submission, confirmation, and new password set",
+        "No step definition duplicates functionality already available in sharedSteps.ts",
+        "The scenario-to-requirement mapping is presented to the user before writing files",
+        "npx playwright test passes for the PasswordReset flow"
+      ]
+    }
+  ]
+}

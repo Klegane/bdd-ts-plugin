@@ -1,0 +1,66 @@
+[
+  {
+    "query": "test accessibility for my Button component — it needs to be keyboard navigable and have proper ARIA labels",
+    "should_trigger": true
+  },
+  {
+    "query": "I need WCAG compliance tests for the Modal component. it should trap focus and be announced to screen readers",
+    "should_trigger": true
+  },
+  {
+    "query": "can you add axe-core tests for the Dropdown component? I want to catch any a11y violations automatically",
+    "should_trigger": true
+  },
+  {
+    "query": "check color contrast accessibility for my Card component — it has light gray text that might fail WCAG AA",
+    "should_trigger": true
+  },
+  {
+    "query": "I need to verify keyboard navigation works on my Tabs component — users should be able to tab through all tabs and activate with Enter",
+    "should_trigger": true
+  },
+  {
+    "query": "add a11y BDD tests for the SearchBar — make sure screen readers can understand the search results region",
+    "should_trigger": true
+  },
+  {
+    "query": "create an .a11y.feature file for the Form component to test label association and error identification",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to make sure my AlertBanner component is accessible — it uses role=alert and needs to announce to assistive technology",
+    "should_trigger": true
+  },
+  {
+    "query": "add BDD tests for my Button component — it has variants (primary, secondary) and a disabled state",
+    "should_trigger": false
+  },
+  {
+    "query": "I need E2E Playwright tests for the checkout flow — user adds to cart, fills form, sees confirmation",
+    "should_trigger": false
+  },
+  {
+    "query": "generate an Allure test report from my latest test run",
+    "should_trigger": false
+  },
+  {
+    "query": "write a unit test for the calculateTotal utility function using vitest",
+    "should_trigger": false
+  },
+  {
+    "query": "fix the TypeScript error in my Button component — it's complaining about missing props",
+    "should_trigger": false
+  },
+  {
+    "query": "set up Cypress for browser testing in my React project",
+    "should_trigger": false
+  },
+  {
+    "query": "I need snapshot tests for the Card component to catch visual regressions",
+    "should_trigger": false
+  },
+  {
+    "query": "can you add a storybook story for my Tooltip component showing all placement variants?",
+    "should_trigger": false
+  }
+]

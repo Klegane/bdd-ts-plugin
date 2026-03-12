@@ -1,0 +1,57 @@
+{
+  "skill_name": "allure-report",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "first-time-setup",
+      "prompt": "I want to set up Allure reporting for my project — I've never used it before. My vitest config is at vitest.config.ts and I already have tests running with vitest",
+      "expected_output": "allure-vitest is installed, vitest.config.ts is updated with the Allure reporter alongside the default reporter, .gitignore is updated, and an HTML report is generated and served.",
+      "files": [],
+      "assertions": [
+        "The skill checks package.json for existing allure-vitest before installing",
+        "The skill checks vitest.config.ts for an existing Allure reporter entry",
+        "npm install -D allure-vitest allure-js-commons is executed",
+        "vitest.config.ts is updated to include 'allure-vitest/reporter' in the reporters array",
+        "The 'default' reporter is preserved in the reporters array",
+        "The resultsDir is set to './allure-results'",
+        "allure-results/ and allure-report/ are added to .gitignore",
+        "npm test -- --run is executed to produce test results",
+        "npx allure generate is executed with --clean flag",
+        "The report path ./allure-report/index.html is communicated to the user",
+        "The reopen command npx allure open ./allure-report is communicated to the user"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "generate-after-tests",
+      "prompt": "I just ran my BDD tests and they all pass. Can you generate an Allure report? I already have allure-vitest configured",
+      "expected_output": "The skill detects that Allure is already configured, skips setup, and generates the HTML report directly from existing allure-results/.",
+      "files": [],
+      "assertions": [
+        "The skill checks package.json and confirms allure-vitest is present",
+        "The skill checks vitest.config.ts and confirms the reporter is configured",
+        "The skill does NOT run npm install for allure-vitest (already installed)",
+        "The skill does NOT modify vitest.config.ts (already configured)",
+        "npx allure generate ./allure-results --clean -o ./allure-report is executed",
+        "The report path and reopen command are communicated to the user"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "setup-with-existing-reporters",
+      "prompt": "set up Allure for my project. I already have a custom reporter configured in vitest.config.ts — make sure you don't remove it. My config has reporters: ['default', 'junit']",
+      "expected_output": "allure-vitest is installed and added to the reporters array alongside both 'default' and 'junit' — neither existing reporter is removed.",
+      "files": [],
+      "assertions": [
+        "The skill reads vitest.config.ts before modifying it",
+        "The 'default' reporter is preserved in the reporters array",
+        "The 'junit' reporter is preserved in the reporters array",
+        "The 'allure-vitest/reporter' entry is added to the reporters array",
+        "The resulting reporters array contains all three reporters",
+        "npm install -D allure-vitest allure-js-commons is executed",
+        "allure-results/ and allure-report/ are added to .gitignore if not already present",
+        "npx allure generate is executed after tests run"
+      ]
+    }
+  ]
+}

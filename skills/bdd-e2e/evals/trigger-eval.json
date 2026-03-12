@@ -1,0 +1,66 @@
+[
+  {
+    "query": "create E2E BDD tests for the checkout flow — user adds item to cart, fills shipping form, and sees confirmation",
+    "should_trigger": true
+  },
+  {
+    "query": "I need Playwright BDD tests for the login flow — valid credentials go to dashboard, invalid shows an error",
+    "should_trigger": true
+  },
+  {
+    "query": "set up end-to-end browser tests for the user registration journey using Gherkin feature files",
+    "should_trigger": true
+  },
+  {
+    "query": "I want E2E tests for the search flow — user types a query, sees results, clicks a result, and lands on the detail page",
+    "should_trigger": true
+  },
+  {
+    "query": "can you scaffold Playwright BDD scenarios for the onboarding wizard? it has 3 steps with next/back navigation",
+    "should_trigger": true
+  },
+  {
+    "query": "add an end-to-end test for the password reset flow — user clicks forgot password, enters email, gets confirmation",
+    "should_trigger": true
+  },
+  {
+    "query": "write E2E feature files for the shopping cart — add items, update quantities, remove items, and proceed to checkout",
+    "should_trigger": true
+  },
+  {
+    "query": "I need browser-level BDD tests for the admin dashboard — login as admin, view user list, and ban a user",
+    "should_trigger": true
+  },
+  {
+    "query": "add BDD tests for my Button component — it has variants (primary, secondary) and a disabled state",
+    "should_trigger": false
+  },
+  {
+    "query": "test accessibility for my Modal component — it needs keyboard navigation and focus trapping",
+    "should_trigger": false
+  },
+  {
+    "query": "generate an Allure test report from my latest test run",
+    "should_trigger": false
+  },
+  {
+    "query": "write a unit test for the calculateTotal utility function using vitest",
+    "should_trigger": false
+  },
+  {
+    "query": "I need WCAG compliance tests for the Form component with axe-core",
+    "should_trigger": false
+  },
+  {
+    "query": "can you add a storybook story for my Tooltip component showing all placement variants?",
+    "should_trigger": false
+  },
+  {
+    "query": "set up Cypress for browser testing in my React project",
+    "should_trigger": false
+  },
+  {
+    "query": "I need snapshot tests for the Card component to catch visual regressions",
+    "should_trigger": false
+  }
+]
