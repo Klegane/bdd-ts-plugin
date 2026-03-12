@@ -142,7 +142,16 @@ After the delegated skill completes successfully, **always** ask the user:
 
 ### Phase 5: Feature drift check (unit and accessibility tests)
 - Run `npm test -- --run src/test/featureDrift` to confirm no orphaned feature or step files exist.
-- Report completion to the user with a summary of what was created, explicitly noting which files are tagged `@a11y` for selective execution.
+
+### Phase 6: Generate Allure report
+After all tests pass, always generate an Allure report:
+- Invoke the `/bdd-ts-plugin:allure-report` skill. It will handle setup (if Allure is not yet configured) and report generation automatically.
+- If Allure is already configured, it will generate the report directly from the latest test results in `allure-results/`.
+- If Allure is not yet configured, it will install `allure-vitest`, configure the reporter in `vitest.config.ts`, re-run the tests to produce results, and then generate the report.
+- After the report is generated, inform the user of the report path (`./allure-report/index.html`) and how to re-open it (`npx allure open ./allure-report`).
+
+### Phase 7: Summary
+- Report completion to the user with a summary of what was created, explicitly noting which files are tagged `@a11y` for selective execution and where the Allure report can be found.
 
 ## Important Constraints
 

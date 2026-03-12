@@ -9,10 +9,11 @@ A Claude Code plugin that provides skills and an orchestrator agent for Behavior
 - **`/bdd-ts-plugin:bdd-unit <ComponentName>`** -- Scaffold component-level BDD tests using `@amiceli/vitest-cucumber` and React Testing Library
 - **`/bdd-ts-plugin:bdd-a11y <ComponentName>`** -- Scaffold accessibility BDD tests using `@amiceli/vitest-cucumber`, React Testing Library, and `vitest-axe` (axe-core) for WCAG compliance
 - **`/bdd-ts-plugin:bdd-e2e <FlowName>`** -- Scaffold E2E BDD tests using Playwright
+- **`/bdd-ts-plugin:allure-report`** -- Set up and generate Allure HTML test reports (handles one-time `allure-vitest` installation, vitest reporter configuration, and on-demand report generation)
 
 ### Agent (requirements-driven orchestration)
 
-- **`bdd-orchestrator`** -- Takes user requirements as input, classifies the test type (unit vs accessibility vs E2E), extracts scenarios, and delegates to the appropriate skill. Drives the full workflow from requirements to passing tests.
+- **`bdd-orchestrator`** -- Takes user requirements as input, classifies the test type (unit vs accessibility vs E2E), extracts scenarios, delegates to the appropriate skill, and automatically generates an Allure report after tests pass.
 
 ### Bundled rules
 
@@ -95,7 +96,9 @@ The agent will:
 4. Run tests (expect red)
 5. Write the `.steps.tsx` file
 6. Run tests until green
-7. Verify no orphaned files
+7. Offer to add accessibility tests (if not already requested)
+8. Verify no orphaned files
+9. Generate an Allure HTML report
 
 ## Requirements
 
@@ -104,6 +107,7 @@ Your project needs:
 - **For unit BDD tests**: `@amiceli/vitest-cucumber`, `@testing-library/react`, `vitest`
 - **For accessibility BDD tests**: `@amiceli/vitest-cucumber`, `@testing-library/react`, `vitest`, `vitest-axe`
 - **For E2E BDD tests**: `@playwright/test` and a Playwright+Cucumber bridge (e.g., `playwright-bdd`)
+- **For Allure reports**: `allure-vitest`, `allure-js-commons`, and the [Allure CLI](https://docs.qameta.io/allure/) (available via `npx allure` or installed globally)
 
 ## Plugin structure
 
@@ -116,8 +120,10 @@ bdd-ts-plugin/
 │   │   └── SKILL.md         # Component-level BDD skill
 │   ├── bdd-a11y/
 │   │   └── SKILL.md         # Accessibility BDD skill
-│   └── bdd-e2e/
-│       └── SKILL.md         # Playwright E2E BDD skill
+│   ├── bdd-e2e/
+│   │   └── SKILL.md         # Playwright E2E BDD skill
+│   └── allure-report/
+│       └── SKILL.md         # Allure report setup & generation
 ├── agents/
 │   └── bdd-orchestrator.md  # Orchestrator agent (carries all 11 rules)
 ├── settings.json             # Default agent settings
