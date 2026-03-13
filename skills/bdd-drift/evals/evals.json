@@ -1,0 +1,48 @@
+{
+  "skill_name": "bdd-drift",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "clean-project-no-drift",
+      "prompt": "check for feature drift across all my BDD tests — unit, a11y, and e2e",
+      "expected_output": "A drift report showing all file pairs are matched with no orphaned files.",
+      "files": [],
+      "assertions": [
+        "The skill scans src/**/*.feature and src/**/*.steps.tsx for unit tests",
+        "The skill scans src/**/*.a11y.feature and src/**/*.a11y.steps.tsx for a11y tests",
+        "The skill scans e2e/features/*.feature and e2e/steps/*.steps.ts for E2E tests",
+        "The skill excludes sharedSteps.ts and sharedA11ySteps.ts from orphan detection",
+        "A summary table is presented showing total files, matched pairs, and orphaned count",
+        "The report confirms zero orphaned files"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "orphaned-unit-tests",
+      "prompt": "run drift detection — I think I deleted a component but left its test files behind",
+      "expected_output": "The drift report identifies orphaned test files where the source component no longer exists.",
+      "files": [],
+      "assertions": [
+        "The skill checks that the source component (.tsx) exists for each test file pair",
+        "Orphaned files are flagged with status ORPHANED in the report",
+        "The report explains why each file is considered orphaned",
+        "Suggested fixes are presented (delete, create counterpart, or rename)",
+        "The skill does NOT delete any files automatically"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "mismatched-a11y-files",
+      "prompt": "check drift for a11y tests only — I renamed some components and I'm not sure all the a11y test files got updated",
+      "expected_output": "A drift report scoped to a11y tests showing any .a11y.feature files without matching .a11y.steps.tsx and vice versa.",
+      "files": [],
+      "assertions": [
+        "The skill only scans a11y files (*.a11y.feature and *.a11y.steps.tsx), not unit or E2E",
+        "For each .a11y.feature, the skill checks for a matching .a11y.steps.tsx in the same directory",
+        "For each .a11y.steps.tsx, the skill checks for a matching .a11y.feature in the same directory",
+        "Mismatched files are reported with suggested renames",
+        "The skill does NOT modify any files without user confirmation"
+      ]
+    }
+  ]
+}

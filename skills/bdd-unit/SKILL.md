@@ -43,7 +43,7 @@ This project uses `@amiceli/vitest-cucumber` which converts every Step into an i
 - Use the `describeFeature` and `Scenario` wrapper syntax.
 - Use `AfterEachScenario` from the `describeFeature` parameters. Do **not** use `beforeEach()` — it resets DOM state between individual step executions.
 
-### Rule 6: Assertion Quality
+### Rule 12: Assertion Quality
 Assertions must verify something meaningful. A weak assertion that never fails is worse than no assertion — it gives false confidence.
 
 - **NEVER** use `.toBeTruthy()` or `.toBeDefined()` to check element existence. RTL's `getBy*` queries already throw if the element is missing, so `.toBeTruthy()` is a no-op that tests nothing.
@@ -60,7 +60,7 @@ Assertions must verify something meaningful. A weak assertion that never fails i
 **Good:** `expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com')`
 **Good:** `expect(screen.getByRole('link')).toHaveAttribute('target', '_blank')`
 
-### Rule 7: Data-Driven Component Guards
+### Rule 13: Data-Driven Component Guards
 When a component renders items from a data array (e.g., a list of cards, navigation items, table rows):
 
 - **Always assert the expected count** — verify the correct number of items rendered, not just that "some" exist.
@@ -82,7 +82,7 @@ games.forEach((game) => {
 })
 ```
 
-### Rule 8: Interaction Coverage
+### Rule 14: Interaction Coverage
 When a component has interactive elements (links, buttons, inputs, toggleable widgets), the test suite MUST include at least one scenario that exercises user interaction, not just static rendering.
 
 - Use `userEvent` from `@testing-library/user-event` for all interactions — never `fireEvent`.
@@ -91,19 +91,31 @@ When a component has interactive elements (links, buttons, inputs, toggleable wi
 
 ## Existing shared steps
 
-The following shared helpers and mock data are available for reuse. Duplicating what already exists here wastes effort and creates maintenance burden:
+Before writing new step definitions, check these files for reusable logic:
 
-!`cat src/test/sharedSteps.ts 2>/dev/null || echo "No shared steps file found."`
+1. Read `src/test/sharedSteps.ts` (if it exists) — it contains shared step helpers used across components.
+2. Use Glob to find all `src/**/*.feature` files and scan them for step patterns you can reuse.
+3. Use Glob to find all `src/**/*.steps.tsx` files and check for shared imports or helpers.
 
-## Existing feature files
-
-These feature files already exist in the project — check them for reusable step patterns before inventing new ones:
-
-!`find src -name "*.feature" 2>/dev/null || echo "No feature files found."`
+Duplicating what already exists wastes effort and creates maintenance burden. If no shared steps file exists yet, note that — you may want to propose creating one after this task.
 
 ## Workflow
 
 Follow these steps in order. Each step builds on the previous one, and skipping ahead (especially writing steps before confirming scenarios) leads to rework.
+
+### Step 0: Validate prerequisites
+
+Before starting, verify these packages exist in `package.json` `devDependencies`:
+- `@amiceli/vitest-cucumber`
+- `@testing-library/react`
+- `@testing-library/jest-dom`
+- `@testing-library/user-event`
+- `vitest`
+
+If any are missing, inform the user and offer to install them before proceeding:
+```bash
+npm install -D @amiceli/vitest-cucumber @testing-library/react @testing-library/jest-dom @testing-library/user-event vitest
+```
 
 ### Step 1: Gather requirements
 
@@ -134,8 +146,8 @@ Wait for the user's OK. They often have context about edge cases or priorities t
 
 ### Step 4: Check shared steps
 
-- Review the shared steps injected above in the "Existing shared steps" section.
-- Also check existing feature files listed above for step patterns that can be reused.
+- Follow the instructions in the "Existing shared steps" section above to find reusable step logic.
+- Read `src/test/sharedSteps.ts` and scan existing `.feature` files for step patterns that can be reused.
 - Reuse existing shared steps before creating new ones. Consistent step language across features makes the whole test suite easier to read and maintain.
 
 ### Step 5: Design the feature file
@@ -234,3 +246,11 @@ Fix the step definitions and re-run until green.
 ### Step 9: Verify feature drift guard
 
 Run `npm test -- --run src/test/featureDrift` to ensure no orphaned feature or step files exist. This catches situations where a component was deleted or renamed but its test files were left behind.
+
+### Step 10: Post-completion
+
+After all tests pass, remind the user about these next steps:
+
+1. **Accessibility tests**: "Would you like me to add accessibility (WCAG) tests for this component? Use `/bdd-ts-plugin:bdd-a11y $0` to scaffold a11y tests that verify keyboard navigation, color contrast, and screen reader support."
+2. **Allure report**: "Run `/bdd-ts-plugin:allure-report` to generate an HTML test report from these results."
+3. **Drift guard**: If `src/test/featureDrift` does not exist yet, suggest the user create it or invoke `/bdd-ts-plugin:bdd-drift`.

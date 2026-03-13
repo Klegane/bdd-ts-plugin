@@ -43,6 +43,25 @@ The following rules are non-negotiable and must be followed throughout the entir
 
 **Rule 11 — Mandatory `@a11y` Tag**: Every a11y feature file MUST include `@a11y @wcag-aa` (or `@wcag-aaa`) at the Feature level. This enables selective execution (`npm test -- --run **/*.a11y.steps.tsx`), report-level filtering, and CI pipeline separation.
 
+### Code Quality Rules (unit and a11y step definitions)
+
+**Rule 12 — Assertion Quality**: Assertions must verify something meaningful. A weak assertion that never fails is worse than no assertion — it gives false confidence.
+- **NEVER** use `.toBeTruthy()` or `.toBeDefined()` to check element existence. RTL's `getBy*` queries already throw if the element is missing, so `.toBeTruthy()` is a no-op.
+- **Always import** `@testing-library/jest-dom/vitest` at the top of step definition files to enable semantic matchers.
+- **Use semantic matchers**: `toBeInTheDocument()`, `toHaveAttribute()`, `toHaveTextContent()`, `toBeVisible()`, `toHaveAccessibleName()`, `toHaveFocus()`.
+- **Use `userEvent`** (never `fireEvent`) for all interaction assertions.
+
+**Rule 13 — Data-Driven Component Guards**: When a component renders items from a data array, always assert the array is non-empty (`expect(items.length).toBeGreaterThan(0)`) and assert the expected count of rendered items (`expect(screen.getAllByRole(...)).toHaveLength(items.length)`). An empty array means zero assertions and a silently passing test.
+
+**Rule 14 — Interaction Coverage**: When a component has interactive elements (links, buttons, inputs, toggleable widgets), the test suite MUST include at least one scenario that exercises user interaction via `userEvent`, not just static rendering checks.
+
+### Import Conventions (unit and a11y step definitions)
+
+All `.steps.tsx` files MUST use these imports:
+- `import { render, screen, cleanup } from '@testing-library/react/pure'` — the `/pure` import prevents auto-cleanup that conflicts with `AfterEachScenario`.
+- `import '@testing-library/jest-dom/vitest'` — enables semantic matchers.
+- `import userEvent from '@testing-library/user-event'` — for interaction testing.
+
 ## Unit Test Guidelines
 
 When generating or refactoring unit test code, you MUST strictly follow these rules:
@@ -93,9 +112,9 @@ When providing data, use realistic business-layer data. Avoid abstract variables
 - **Magic Numbers/Strings**: Do not use literals directly in asserts without context.
 - **Multiple Disconnected Asserts**: Ensure you test a single behavior per test.
 - **Conditionals in Tests**: If the test requires an `if`, you must split it into two distinct tests.
-- **No-op Assertions**: NEVER use `.toBeTruthy()` or `.toBeDefined()` to check element existence. RTL's `getBy*` queries throw when an element is missing, making `.toBeTruthy()` an assertion that can never fail. Use `toBeInTheDocument()`, `toHaveAttribute()`, `toHaveTextContent()`, or `toBeVisible()` from `@testing-library/jest-dom` instead. Always import `@testing-library/jest-dom/vitest` in step definition files.
-- **Unguarded Iterations**: NEVER loop over a data array to make assertions without first asserting the array is non-empty. An empty array produces zero assertions and a silently passing test. Always add `expect(items.length).toBeGreaterThan(0)` before the loop.
-- **Missing Interaction Coverage**: If a component has interactive elements (links, buttons, inputs), the test suite MUST include at least one scenario that exercises user interaction via `userEvent`, not just static rendering checks.
+- **No-op Assertions**: See Rule 12 — never use `.toBeTruthy()` or `.toBeDefined()` for element existence.
+- **Unguarded Iterations**: See Rule 13 — always guard data-driven loops with non-empty assertions.
+- **Missing Interaction Coverage**: See Rule 14 — interactive components must have interaction scenarios.
 
 ## Workflow
 
@@ -134,27 +153,45 @@ After the delegated skill completes successfully, **always** ask the user:
 - If the user declines: proceed directly to Phase 4.
 - Skip this phase if the original classification was already **accessibility** (the user explicitly asked for a11y tests) or if the user already requested both unit and accessibility tests upfront.
 
-### Phase 4: Verify
-- After all skills complete, verify all tests pass.
+### Phase 4: Quality gate
+After the skill generates files, run the `bdd-quality-gate` agent to validate the output before running tests. The quality gate checks:
+- Feature files: no leaked selectors/URLs, parameterized steps, declarative language, `@a11y` tags (if a11y)
+- Step definitions: correct imports (`@testing-library/react/pure`, `@testing-library/jest-dom/vitest`), `AfterEachScenario` (not `beforeEach`), `_ctx` first arg, `{string}`/`{int}` templates, no `.toBeTruthy()`, semantic matchers used
+- A11y-specific: `vitest-axe` imports, `expect.extend({ toHaveNoViolations })`, `render().container` passed to `axe()`
+- Data-driven: empty-array guards, item count assertions
+- Interaction coverage: at least one `userEvent` scenario for interactive components
+
+If the quality gate reports failures, fix them before proceeding. Do not run tests on code that violates the rules.
+
+### Phase 5: Verify
+- After the quality gate passes, verify all tests pass.
 - For unit tests: run `npm test -- --run <path>`.
 - For accessibility tests: run `npm test -- --run <path>`.
-- For E2E tests: run `npx playwright test <path>`.
+- For E2E tests: run `npx bddgen && npx playwright test <path>`.
 - To run **only** accessibility tests: run `npm test -- --run **/*.a11y.steps.tsx`.
 - To run **everything except** accessibility tests: run `npm test -- --run --exclude **/*.a11y.steps.tsx` or use glob negation patterns depending on the project's vitest configuration.
 - If tests fail, fix step definitions and re-run until green.
 
-### Phase 5: Feature drift check (unit and accessibility tests)
-- Run `npm test -- --run src/test/featureDrift` to confirm no orphaned feature or step files exist.
+### Phase 6: Feature drift check
+- Invoke `/bdd-ts-plugin:bdd-drift all` to check for orphaned or mismatched files across unit, a11y, and E2E test suites.
+- If `src/test/featureDrift` exists as an automated test, also run `npm test -- --run src/test/featureDrift`.
+- If orphaned files are found, present them to the user and suggest fixes before proceeding.
 
-### Phase 6: Generate Allure report
+### Phase 7: Generate Allure report
 After all tests pass, always generate an Allure report:
 - Invoke the `/bdd-ts-plugin:allure-report` skill. It will handle setup (if Allure is not yet configured) and report generation automatically.
 - If Allure is already configured, it will generate the report directly from the latest test results in `allure-results/`.
 - If Allure is not yet configured, it will install `allure-vitest`, configure the reporter in `vitest.config.ts`, re-run the tests to produce results, and then generate the report.
 - After the report is generated, inform the user of the report path (`./allure-report/index.html`) and how to re-open it (`npx allure open ./allure-report`).
 
-### Phase 7: Summary
-- Report completion to the user with a summary of what was created, explicitly noting which files are tagged `@a11y` for selective execution and where the Allure report can be found.
+### Phase 8: Summary
+- Report completion to the user with a summary of:
+  - Files created/modified (with paths)
+  - Quality gate results (passed/failed checks)
+  - Test results (all green)
+  - Which files are tagged `@a11y` for selective execution
+  - Where the Allure report can be found
+  - Any drift issues detected and resolved
 
 ## Important Constraints
 

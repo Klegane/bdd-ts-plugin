@@ -39,15 +39,31 @@ Before writing a new step definition, verify if a similar step already exists. R
 
 ## Existing E2E shared steps
 
-!`cat e2e/support/sharedSteps.ts 2>/dev/null || echo "No E2E shared steps file found yet."`
+Before writing new E2E step definitions, check these files for reusable logic:
 
-## Existing E2E feature files
+1. Read `e2e/support/sharedSteps.ts` (if it exists) — it contains shared E2E step helpers (page navigation, authentication, form filling).
+2. Use Glob to find all `e2e/features/*.feature` files and scan them for step patterns you can reuse.
+3. Use Glob to find all `e2e/steps/*.steps.ts` files and check for shared imports or helpers.
 
-!`find e2e -name "*.feature" 2>/dev/null || echo "No E2E feature files found yet."`
+Duplicating what already exists wastes effort and creates maintenance burden.
 
 ## Workflow (Order of Operations)
 
 Follow these steps strictly in order:
+
+### Step 0: Validate prerequisites
+
+Before starting, verify these packages exist in `package.json` `devDependencies`:
+- `@playwright/test`
+- `playwright-bdd`
+
+If any are missing, inform the user and offer to install them before proceeding:
+```bash
+npm install -D @playwright/test playwright-bdd
+npx playwright install
+```
+
+Also check that `playwright.config.ts` exists. If `playwright-bdd` is newly installed, it may need configuration — add `testDir` pointing to a generated `.features-gen` directory and configure the `defineBddConfig` helper per `playwright-bdd` docs.
 
 ### Step 1: Gather requirements
 - Ask the user to describe the user flow if `$0` is ambiguous.
@@ -75,8 +91,8 @@ Follow these steps strictly in order:
   ```
 
 ### Step 4: Check shared E2E steps
-- Review the shared steps injected above in the "Existing E2E shared steps" section.
-- Also check existing feature files listed above for step patterns that can be reused.
+- Follow the instructions in the "Existing E2E shared steps" section above to find reusable step logic.
+- Read `e2e/support/sharedSteps.ts` and scan existing `e2e/features/*.feature` files for step patterns that can be reused.
 - Reuse existing steps before creating new ones.
 
 ### Step 5: Design the feature file
@@ -88,53 +104,62 @@ Follow these steps strictly in order:
 ### Step 6: Implement the step definitions
 - Create or update `e2e/steps/$0.steps.ts`.
 - Use Playwright's `page` object for all browser interactions.
-- Follow this structure:
+- This skill uses `playwright-bdd` to connect Playwright with Gherkin. Follow this structure:
 
 ```ts
-import { test, expect } from '@playwright/test'
-import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber'
+import { createBdd } from 'playwright-bdd'
 
-// Adjust the feature loading based on the Playwright + Cucumber integration used
-const feature = await loadFeature('./e2e/features/$0.feature')
+const { Given, When, Then } = createBdd()
 
-describeFeature(feature, ({ Scenario, BeforeEachScenario, AfterEachScenario }) => {
-  let page: Page
+// URL mapping — keep URLs out of feature files
+const pages: Record<string, string> = {
+  home: '/',
+  checkout: '/checkout',
+  login: '/login',
+}
 
-  BeforeEachScenario(async ({ browser }) => {
-    page = await browser.newPage()
-  })
+Given('the user is on the {string} page', async ({ page }, pageName: string) => {
+  await page.goto(pages[pageName] ?? `/${pageName}`)
+})
 
-  AfterEachScenario(async () => {
-    await page.close()
-  })
+When('the user clicks {string}', async ({ page }, buttonText: string) => {
+  await page.getByRole('button', { name: buttonText }).click()
+})
 
-  Scenario('Scenario name matching feature file', ({ Given, When, Then }) => {
-    Given('the user is on the {string} page', async (_ctx, pageName: string) => {
-      // Map pageName to URL -- keep URLs out of feature files
-      await page.goto(getUrlForPage(pageName))
-    })
+When('the user fills in {string} with {string}', async ({ page }, label: string, value: string) => {
+  await page.getByLabel(label).fill(value)
+})
 
-    When('the user clicks {string}', async (_ctx, buttonText: string) => {
-      await page.getByRole('button', { name: buttonText }).click()
-    })
+Then('the user should see {string}', async ({ page }, text: string) => {
+  await expect(page.getByText(text)).toBeVisible()
+})
 
-    Then('the user should see {string}', async (_ctx, text: string) => {
-      await expect(page.getByText(text)).toBeVisible()
-    })
-  })
+Then('the user is redirected to the {string} page', async ({ page }, pageName: string) => {
+  await expect(page).toHaveURL(new RegExp(pages[pageName] ?? pageName))
 })
 ```
 
-- Use Playwright locators (`getByRole`, `getByText`, `getByLabel`) -- avoid raw CSS selectors.
-- Use `_ctx` as the first argument in parameterized steps.
-- Use string templates (`{string}`, `{int}`) -- never regex matchers.
+Key conventions:
+- **`playwright-bdd`** bridges Playwright and Gherkin — it reads `.feature` files and maps them to step definitions. Do NOT use `@amiceli/vitest-cucumber` here (that is for component-level vitest tests only).
+- Use Playwright locators (`getByRole`, `getByText`, `getByLabel`) — avoid raw CSS selectors.
+- Playwright-bdd passes `{ page }` as the first argument (destructured fixtures), not `_ctx`. This differs from vitest-cucumber's convention.
+- Use string templates (`{string}`, `{int}`) — never regex matchers.
 - Keep page URLs and selectors inside step definitions, never in feature files.
 
 ### Step 7: Run the E2E tests
-- Run `npx playwright test e2e/` to execute the scenarios.
+- Run `npx bddgen && npx playwright test` to generate test files from features and execute them.
 - If tests fail, fix the step definitions and re-run until green.
 
 ## Notes
-- E2E tests are slow -- keep scenarios focused on critical user journeys.
+- E2E tests are slow — keep scenarios focused on critical user journeys.
 - Prefer `getByRole` and `getByLabel` over `getByTestId` for accessibility.
-- If a Playwright + Cucumber bridge package is not yet installed, inform the user and suggest options (e.g., `playwright-bdd` or a custom integration).
+- The `playwright-bdd` package must be installed: `npm install -D playwright-bdd`. If not installed, inform the user and install it before proceeding.
+- The project's `playwright.config.ts` must include the `playwright-bdd` configuration. If missing, add it during Step 0.
+
+## Post-completion
+
+After all E2E tests pass, remind the user about:
+
+1. **Accessibility tests**: "Would you like me to add accessibility (WCAG) tests for any of the components exercised in this flow? Use `/bdd-ts-plugin:bdd-a11y <ComponentName>` to scaffold a11y tests."
+2. **Allure report**: "Run `/bdd-ts-plugin:allure-report` to generate an HTML test report from these results."
+3. **Drift guard**: Check that each `e2e/features/*.feature` has a matching `e2e/steps/*.steps.ts` and vice versa.

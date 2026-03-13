@@ -67,6 +67,33 @@
         "New assertions do NOT use .toBeTruthy() for element presence — use semantic matchers",
         "npm test passes for the Modal component"
       ]
+    },
+    {
+      "id": 4,
+      "eval_name": "missing-vitest-axe-error",
+      "prompt": "add accessibility tests for my Sidebar component at src/components/Sidebar/Sidebar.tsx — the project has vitest and RTL but does not have vitest-axe installed",
+      "expected_output": "The skill detects vitest-axe is missing, informs the user, and offers to install it before scaffolding any files.",
+      "files": [],
+      "assertions": [
+        "The skill checks package.json for vitest-axe",
+        "The skill detects vitest-axe is not in devDependencies",
+        "The skill informs the user that vitest-axe is required for a11y tests",
+        "The skill offers to install vitest-axe before proceeding",
+        "The skill does NOT create .a11y.feature or .a11y.steps.tsx files before the dependency is resolved"
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "axe-violation-is-real-bug",
+      "prompt": "I ran the a11y tests for my Card component and axe-core found violations — the image inside the card is missing alt text. Should I fix the test or the component?",
+      "expected_output": "The skill explains that axe-core violations are real accessibility bugs in the component, not test issues. The component should be fixed, not the test.",
+      "files": [],
+      "assertions": [
+        "The skill explains that axe-core violations are real accessibility issues in the component",
+        "The skill does NOT suggest suppressing or ignoring the axe violation",
+        "The skill suggests fixing the component (e.g., adding alt text to the image)",
+        "The skill does NOT modify the test to skip or exclude the failing rule"
+      ]
     }
   ]
 }

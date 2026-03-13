@@ -79,15 +79,14 @@ A11y step files often include non-axe assertions (e.g., checking headings exist,
 
 ## Existing shared accessibility steps
 
-The following shared a11y helpers are available for reuse. Duplicating what already exists here wastes effort and creates maintenance burden:
+Before writing new a11y step definitions, check these files for reusable logic:
 
-!`cat src/test/sharedA11ySteps.ts 2>/dev/null || echo "No shared a11y steps file found."`
+1. Read `src/test/sharedA11ySteps.ts` (if it exists) — it contains shared a11y step helpers (baseline axe audit, targeted rule checks, keyboard navigation).
+2. Read `src/test/sharedSteps.ts` (if it exists) — generic shared steps may also be reusable in a11y contexts.
+3. Use Glob to find all `src/**/*.a11y.feature` files and scan them for step patterns you can reuse.
+4. Use Glob to find all `src/**/*.a11y.steps.tsx` files and check for shared imports or helpers.
 
-## Existing accessibility feature files
-
-These a11y feature files already exist in the project — check them for reusable step patterns before inventing new ones:
-
-!`find src -name "*.a11y.feature" 2>/dev/null || echo "No a11y feature files found."`
+Duplicating what already exists wastes effort and creates maintenance burden. If no shared a11y steps file exists yet, note that — you may want to propose creating one after this task.
 
 ## WCAG 2.1 Quick Reference
 
@@ -105,6 +104,21 @@ Default WCAG level: **AA**. If the user requests AAA, note it in the Feature hea
 ## Workflow
 
 Follow these steps in order. Each step builds on the previous one, and skipping ahead (especially writing steps before confirming scenarios) leads to rework.
+
+### Step 0: Validate prerequisites
+
+Before starting, verify these packages exist in `package.json` `devDependencies`:
+- `@amiceli/vitest-cucumber`
+- `@testing-library/react`
+- `@testing-library/jest-dom`
+- `@testing-library/user-event`
+- `vitest`
+- `vitest-axe`
+
+If any are missing, inform the user and offer to install them before proceeding:
+```bash
+npm install -D @amiceli/vitest-cucumber @testing-library/react @testing-library/jest-dom @testing-library/user-event vitest vitest-axe
+```
 
 ### Step 1: Gather requirements
 
@@ -145,8 +159,8 @@ Wait for the user's OK. They often have context about accessibility requirements
 
 ### Step 4: Check shared accessibility steps
 
-- Review the shared a11y steps injected above in the "Existing shared accessibility steps" section.
-- Also check existing a11y feature files listed above for step patterns that can be reused.
+- Follow the instructions in the "Existing shared accessibility steps" section above to find reusable step logic.
+- Read `src/test/sharedA11ySteps.ts` and scan existing `.a11y.feature` files for step patterns that can be reused.
 - Common reusable a11y steps include:
   - `Then no automated accessibility violations are detected` (axe-core full audit)
   - `Then no accessibility violations for {string} are detected` (axe-core with specific rule tags)
@@ -313,3 +327,10 @@ After completing the workflow, inform the user of the available execution comman
 - **CI pipeline separation**: a11y tests can be isolated into a dedicated pipeline stage using the `**/*.a11y.steps.tsx` glob pattern.
 
 The `@a11y` tag in the feature file and the `.a11y` infix in filenames work together — the filename enables file-level filtering in the test runner, and the tag enables report-level filtering and makes the test purpose self-documenting.
+
+## Post-completion
+
+After all tests pass, remind the user about:
+
+1. **Allure report**: "Run `/bdd-ts-plugin:allure-report` to generate an HTML test report. The `@a11y` and `@wcag-aa` tags will appear as filterable labels in the Allure dashboard."
+2. **Drift guard**: If `src/test/featureDrift` does not cover `.a11y.feature` / `.a11y.steps.tsx` pairs yet, flag it to the user or suggest invoking `/bdd-ts-plugin:bdd-drift`.

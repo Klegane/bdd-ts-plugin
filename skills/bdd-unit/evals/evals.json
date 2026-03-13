@@ -82,6 +82,35 @@
         "The .steps.tsx file imports @testing-library/jest-dom/vitest",
         "npm test passes for the GamesList component"
       ]
+    },
+    {
+      "id": 5,
+      "eval_name": "missing-component-error",
+      "prompt": "create BDD tests for the UserProfile component at src/components/UserProfile/UserProfile.tsx",
+      "expected_output": "The skill attempts to read the component source, discovers it does not exist, and stops to ask the user instead of guessing or generating tests for a nonexistent component.",
+      "files": [],
+      "assertions": [
+        "The skill attempts to read src/components/UserProfile/UserProfile.tsx",
+        "The skill detects the component file does not exist",
+        "The skill does NOT create a .feature or .steps.tsx file",
+        "The skill informs the user that the component was not found",
+        "The skill asks the user to provide the correct path or confirm the component exists"
+      ]
+    },
+    {
+      "id": 6,
+      "eval_name": "missing-dependencies-error",
+      "prompt": "add BDD tests for my Header component at src/components/Header/Header.tsx — this is a fresh project, I haven't installed any testing dependencies yet",
+      "expected_output": "The skill checks package.json, discovers missing dependencies, and informs the user before proceeding.",
+      "files": [],
+      "assertions": [
+        "The skill checks package.json for @amiceli/vitest-cucumber",
+        "The skill checks package.json for @testing-library/react",
+        "The skill detects one or more missing dependencies",
+        "The skill informs the user which packages are missing",
+        "The skill offers to install the missing packages before proceeding",
+        "The skill does NOT scaffold test files before dependencies are resolved"
+      ]
     }
   ]
 }

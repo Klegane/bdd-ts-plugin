@@ -1,0 +1,50 @@
+[
+  {
+    "query": "check for feature drift in my BDD tests — are there any orphaned files?",
+    "should_trigger": true
+  },
+  {
+    "query": "I deleted some components but I'm not sure I cleaned up all the test files. Can you check?",
+    "should_trigger": true
+  },
+  {
+    "query": "run drift detection for a11y tests only",
+    "should_trigger": true
+  },
+  {
+    "query": "verify that every .feature file has a matching .steps.tsx and vice versa",
+    "should_trigger": true
+  },
+  {
+    "query": "find orphaned test files in my project",
+    "should_trigger": true
+  },
+  {
+    "query": "check if my e2e feature files all have matching step definitions",
+    "should_trigger": true
+  },
+  {
+    "query": "add BDD tests for my Button component — it has variants and a disabled state",
+    "should_trigger": false
+  },
+  {
+    "query": "test accessibility for my Modal component with WCAG compliance",
+    "should_trigger": false
+  },
+  {
+    "query": "generate an Allure report from my test results",
+    "should_trigger": false
+  },
+  {
+    "query": "create E2E Playwright tests for the checkout flow",
+    "should_trigger": false
+  },
+  {
+    "query": "fix the failing test in Button.steps.tsx",
+    "should_trigger": false
+  },
+  {
+    "query": "add a new scenario to my existing Modal.feature for escape key behavior",
+    "should_trigger": false
+  }
+]

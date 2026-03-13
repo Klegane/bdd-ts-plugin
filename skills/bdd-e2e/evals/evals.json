@@ -16,7 +16,7 @@
         "The .steps.ts file uses Playwright's page object for browser interactions",
         "The .steps.ts file uses accessible locators (getByRole, getByText, getByLabel) instead of raw CSS selectors",
         "The .steps.ts file maps page names to URLs inside step definitions, not in the feature file",
-        "All parameterized step callbacks use _ctx as first argument",
+        "Step callbacks use { page } destructured fixtures from playwright-bdd",
         "Step matchers use {string} or {int} templates, not regex",
         "The scenario-to-requirement mapping is presented to the user before writing files",
         "npx playwright test passes for the Checkout flow"
@@ -57,6 +57,20 @@
         "No step definition duplicates functionality already available in sharedSteps.ts",
         "The scenario-to-requirement mapping is presented to the user before writing files",
         "npx playwright test passes for the PasswordReset flow"
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "missing-playwright-bdd-error",
+      "prompt": "create E2E BDD tests for the user profile flow — but I only have @playwright/test installed, I don't think I have any Cucumber bridge package",
+      "expected_output": "The skill detects playwright-bdd is missing, informs the user, and offers to install and configure it before scaffolding test files.",
+      "files": [],
+      "assertions": [
+        "The skill checks package.json for playwright-bdd",
+        "The skill detects playwright-bdd is not in devDependencies",
+        "The skill informs the user that playwright-bdd is required for Gherkin E2E tests",
+        "The skill offers to install playwright-bdd before proceeding",
+        "The skill does NOT create feature or step definition files before the dependency is resolved"
       ]
     }
   ]

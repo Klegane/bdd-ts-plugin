@@ -52,6 +52,20 @@
         "allure-results/ and allure-report/ are added to .gitignore if not already present",
         "npx allure generate is executed after tests run"
       ]
+    },
+    {
+      "id": 4,
+      "eval_name": "empty-allure-results-error",
+      "prompt": "generate an Allure report — Allure is configured but the allure-results/ directory is empty",
+      "expected_output": "The skill detects that allure-results/ is empty and informs the user they need to run tests first to produce results.",
+      "files": [],
+      "assertions": [
+        "The skill checks if allure-results/ directory exists",
+        "The skill detects the directory is empty (no .json result files)",
+        "The skill informs the user that tests need to be run first to produce Allure results",
+        "The skill offers to run npm test -- --run to produce results",
+        "The skill does NOT run npx allure generate on an empty results directory"
+      ]
     }
   ]
 }
